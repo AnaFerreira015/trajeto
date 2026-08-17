@@ -109,7 +109,7 @@ function TimelineView({ events }: { events: TimelineEvent[] }) {
     );
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background">
+    <div className="flex h-dvh flex-col overflow-hidden bg-background">
       <header className="isolate z-20 shrink-0 border-b border-border bg-card/90 px-4 py-3 backdrop-blur sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-xl font-semibold sm:text-2xl">Trajeto</h1>
@@ -144,9 +144,9 @@ function TimelineView({ events }: { events: TimelineEvent[] }) {
         <aside
           aria-label="Resumo e registros"
           className={cn(
-            "z-10 flex flex-col border-border bg-card transition-[max-height] duration-300",
-            "absolute inset-x-0 bottom-0 max-h-[70vh] rounded-t-3xl border-t shadow-soft",
-            !sheetOpen && "max-h-24",
+            "z-30 flex flex-col border-border bg-card transition-[max-height] duration-300",
+            "absolute inset-x-0 bottom-0 max-h-[70dvh] rounded-t-3xl border-t shadow-soft",
+            !sheetOpen && "max-h-14",
             "lg:static lg:max-h-none lg:rounded-none lg:border-t-0 lg:border-l lg:shadow-none",
           )}
         >
@@ -154,20 +154,30 @@ function TimelineView({ events }: { events: TimelineEvent[] }) {
             type="button"
             onClick={() => setSheetOpen((open) => !open)}
             aria-expanded={sheetOpen}
-            className="flex min-h-12 items-center justify-center gap-2 text-sm font-medium text-muted-foreground lg:hidden"
+            className="flex min-h-14 shrink-0 items-center justify-center gap-2 text-sm font-medium text-muted-foreground lg:hidden"
           >
             {sheetOpen ? (
               <ChevronDown className="size-4" aria-hidden="true" />
             ) : (
               <ChevronUp className="size-4" aria-hidden="true" />
             )}
+
             {sheetOpen ? "Recolher painel" : "Ver resumo e registros"}
           </button>
 
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pt-2 pb-8 lg:pt-6">
+          <div
+            className={cn(
+              "min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pt-2 pb-8 lg:pt-6",
+              !sheetOpen && "hidden lg:block",
+            )}
+          >
             {selectedEvent ? (
-              <EventDetails event={selectedEvent} onClose={() => setSelectedId(null)} />
+              <EventDetails
+                event={selectedEvent}
+                onClose={() => setSelectedId(null)}
+              />
             ) : null}
+
             {panel}
           </div>
         </aside>
