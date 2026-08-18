@@ -1,6 +1,6 @@
 import { parseGeoPoint } from "./coordinates";
 import { durationInMinutes, parseIsoDate } from "./dates";
-import type { LatLng, RawRecord, TimelineEvent, VisitEvent } from "./types";
+import type { LatLng, RawRecord, RawTimelinePathPoint, TimelineEvent, VisitEvent } from "./types";
 
 /** Converte um registro bruto do Google no modelo interno. Retorna null se inutilizável. */
 export function normalizeRecord(record: RawRecord, index: number): TimelineEvent | null {
@@ -24,7 +24,7 @@ export function normalizeRecord(record: RawRecord, index: number): TimelineEvent
       probability: toProbability(
         record.visit.topCandidate?.probability ?? record.visit.probability,
       ),
-      placeId: record.visit.topCandidate?.placeID,
+      placeId: record.visit.topCandidate?.placeID ?? record.visit.topCandidate?.placeId,
     };
   }
 
@@ -52,7 +52,7 @@ export function normalizeRecord(record: RawRecord, index: number): TimelineEvent
   if (Array.isArray(record.timelinePath)) {
     const points = [...record.timelinePath]
       .map((point) => ({
-        offset: Number(point?.durationMinutesOffsetFromStartTime ?? 0) || 0,
+        offset: pointOffsetMinutes(point, start),
         coords: parseGeoPoint(point?.point),
       }))
       .filter((point): point is { offset: number; coords: LatLng } => point.coords !== null)
@@ -89,7 +89,7 @@ function dedupeVisits(events: TimelineEvent[]): TimelineEvent[] {
   });
 }
 
-function toProbability(value: string | undefined): number | undefined {
+function toProbability(value: string | number | undefined): number | undefined {
   if (value === undefined) return undefined;
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return undefined;
@@ -137,4 +137,12 @@ export function placeLabel(semanticType: string | undefined): string {
   if (!semanticType) return "Local visitado";
   const normalized = semanticType.toLowerCase().replace(/_/g, " ");
   return SEMANTIC_LABELS[normalized] ?? "Local visitado";
+}
+
+function pointOffsetMinutes(point: RawTimelinePathPoint | undefined, start: Date): number {
+  const offset = Number(point?.durationMinutesOffsetFromStartTime);
+  if (Number.isFinite(offset)) return offset;
+  const time = parseIsoDate(point?.time);
+  if (time) return (time.getTime() - start.getTime()) / 60000;
+  return 0;
 }

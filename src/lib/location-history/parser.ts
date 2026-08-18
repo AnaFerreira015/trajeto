@@ -28,6 +28,7 @@ export function parseTimelineFile(content: string): ParseResult {
   }
 
   const records = extractRecords(data);
+  data = null;
   if (!records) return { ok: false, message: GENERIC_ERROR };
 
   const events = normalizeRecords(records);

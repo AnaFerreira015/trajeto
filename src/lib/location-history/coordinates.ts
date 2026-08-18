@@ -2,8 +2,12 @@ import type { LatLng } from "./types";
 
 /** Converte "geo:-9.123,-35.123" em { lat, lng }. Retorna null se inválido. */
 export function parseGeoPoint(value: unknown): LatLng | null {
+  if (value && typeof value === "object") {
+    const nested = (value as { latLng?: unknown; LatLng?: unknown });
+    return parseGeoPoint(nested.latLng ?? nested.LatLng);
+  }
   if (typeof value !== "string") return null;
-  const raw = value.trim().replace(/^geo:/i, "");
+  const raw = value.trim().replace(/^geo:/i, "").replace(/°/g, "");
   const parts = raw.split(",");
   if (parts.length !== 2) return null;
   const lat = Number(parts[0]);

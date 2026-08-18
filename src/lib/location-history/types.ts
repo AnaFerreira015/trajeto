@@ -4,31 +4,38 @@
  */
 
 /* ---------- Formato bruto (Google) ---------- */
+export type RawGeoValue = string | { latLng?: string } | undefined;
 
 export interface RawTopCandidateVisit {
-  probability?: string;
+  probability?: string | number;
   semanticType?: string;
+  /** iOS */
   placeID?: string;
-  placeLocation?: string;
+  /** Android */
+  placeId?: string;
+  placeLocation?: RawGeoValue;
 }
 
 export interface RawVisit {
-  hierarchyLevel?: string;
-  probability?: string;
+  hierarchyLevel?: string | number;
+  probability?: string | number;
   topCandidate?: RawTopCandidateVisit;
 }
 
 export interface RawActivity {
-  probability?: string;
-  start?: string;
-  end?: string;
-  distanceMeters?: string;
-  topCandidate?: { type?: string; probability?: string };
+  probability?: string | number;
+  start?: RawGeoValue;
+  end?: RawGeoValue;
+  distanceMeters?: string | number;
+  topCandidate?: { type?: string; probability?: string | number };
 }
 
 export interface RawTimelinePathPoint {
-  point?: string;
+  point?: RawGeoValue;
+  /** iOS */
   durationMinutesOffsetFromStartTime?: string;
+  /** Android */
+  time?: string;
 }
 
 export interface RawRecord {
